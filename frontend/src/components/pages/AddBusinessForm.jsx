@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { addServices } from "../apiCalls";
+import Razorpay from "../../../../backend/src/utils/razorpay";
 
 const AddBusinessForm = () => {
   const [name, setName] = useState("");
@@ -8,9 +9,17 @@ const AddBusinessForm = () => {
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const isScriptLoaded = await Razorpay();
+    if (!isScriptLoaded) {
+      alert("Failed to load Razorpay script.");
+      return;
+    }
+
 
     if (!name || !description || !image || !category) {
       setError("All fields are required.");
@@ -25,6 +34,7 @@ const AddBusinessForm = () => {
     formData.append("description", description);
     formData.append("image", image); // File
     formData.append("category", category);
+    formData.append("amount", 50000);
 
     try {
       const response = await addServices(formData); // API call to add service
@@ -121,6 +131,14 @@ const AddBusinessForm = () => {
             disabled={loading}
           >
             {loading ? "Submitting..." : "Submit"}
+          </button>
+          <button
+          type="Pay Now"
+          className="w-full bg-orange-500 text-white py-3 rounded-lg shadow-md hover:bg-orange-600 hover:shadow-lg transform transition hover:scale-105 duration-300"
+          disabled={loading}
+        >
+          {loading ? "Submitting..." : "Pay Now"}
+          
           </button>
         </form>
       </div>

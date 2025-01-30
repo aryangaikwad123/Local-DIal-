@@ -1,9 +1,8 @@
-<script>
-  // Add event listener to the button
-  document.getElementById("pay-now-button").addEventListener("click", function () {
-    // Razorpay payment options
-    const options = {
-      key: "YOUR_RAZORPAY_KEY", // Replace with your Razorpay Key
+// Add event listener to the button
+document.getElementById("pay-now-button").addEventListener("click", function () {
+  // Razorpay payment options
+  const options = {
+      key_id: "YOUR_RAZORPAY_KEY", // Replace with your Razorpay Key
       amount: 50000, // Amount in paisa (₹500.00)
       currency: "INR",
       name: "Your Website Name",
@@ -36,5 +35,5 @@
     });
 
     rzp.open();
-  });
-</script>
+  rzp.open();
+});

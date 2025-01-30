@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Razorpay Integration</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <h1>Razorpay Payment Integration</h1>
+    <button id="pay-button">Pay Now</button>
+
+    <script>
+        document.getElementById('pay-button').onclick = function() {
+            fetch('http://localhost:5000/create-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ amount: 50000 }) // Amount in paise (50000 paise = 500 INR)
+            })
+            .then(response => response.json())
+            .then(data => {
+                const options = {
+                    key: 'YOUR_RAZORPAY_KEY_ID', // Enter the Key ID generated from the Dashboard
+                    amount: data.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 500 INR
+                    currency: data.currency,
+                    name: 'Your Company Name',
+                    description: 'Test Transaction',
+                    order_id: data.id, // Pass the `id` obtained in the previous step
+                    handler: function (response) {
+                        alert('Payment successful: ' + response.razorpay_payment_id);
+                    },
+                    prefill: {
+                        name: 'Your Name',
+                        email: 'your.email@example.com',
+                        contact: '9999999999'
+                    },
+                    notes: {
+                        address: 'note value'
+                    },
+                    theme: {
+                        color: '#F37254'
+                    }
+                };
+                const rzp1 = new Razorpay(options);
+                rzp1.open();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        };
+    </script>
+</body>
+</html>

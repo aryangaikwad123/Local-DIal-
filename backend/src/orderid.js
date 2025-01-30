@@ -8,8 +8,8 @@ app.use(cors());
 
 // Replace with your Razorpay credentials
 const razorpay = new Razorpay({
-  key_id: "YOUR_RAZORPAY_KEY_ID",
-  key_secret: "YOUR_RAZORPAY_KEY_SECRET",
+ key_id: "rzp_test_1DP5mmOlF5G5ag",
+  key_secret: "2s2XQ3g7L7c2v1d6z2v2Q8m2",
 });
 
 // API to create an order

@@ -11,12 +11,15 @@ import Login from "./components/pages/Login";
 import ResetPassword from "./components/pages/ResetPassword";
 import Services from "./components/pages/Services";
 import BusinessCard from "./components/layout/BusinessCard";
-import RazorpayPayment from "./components/layout/razorpay";
+import Payment from "./components/pages/Payment";
 
 
 const App = () => {
   const handleCategoryChange = (category) => {
     console.log("Selected category:", category);
+
+    // You can navigate to a different page based on the selected category
+    // For example, redirect to /categories/:category
   };
 
   
@@ -29,7 +32,6 @@ const App = () => {
 
         <main className="flex-grow">
           <Routes>
-            <Route path="/razorpay" element={<RazorpayPayment />} />
             <Route path="/home" element={<HomePage />} />
             <Route path="/aboutus" element={<AboutUs />} />
             <Route path="/register" element={<Register />} />
@@ -40,11 +42,11 @@ const App = () => {
             <Route path="/businesscard" element={<BusinessCard/>} />
             <Route path="/services" element={<Services />} />
             <Route path="/" element={<Navigate to="/home" />} />
+            <Route path="/payment" element={<Payment />} />
           </Routes>
         </main>
-
-        <RazorpayPayment />
         
+
         {/* Footer */}
         <Footer />
       </div>
