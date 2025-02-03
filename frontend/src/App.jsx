@@ -11,7 +11,11 @@ import Login from "./components/pages/Login";
 import ResetPassword from "./components/pages/ResetPassword";
 import Services from "./components/pages/Services";
 import BusinessCard from "./components/layout/BusinessCard";
-import Payment from "./components/pages/Payment";
+import axios from "axios";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+
+
+
 
 
 const App = () => {
@@ -21,6 +25,16 @@ const App = () => {
     // You can navigate to a different page based on the selected category
     // For example, redirect to /categories/:category
   };
+    const [amount, setAmount] = useState("10");
+  
+    const createOrder = async () => {
+      try {
+        const response = await axios.post("http://localhost:5000/pay", { amount });
+        window.location.href = response.data.approvalUrl;
+      } catch (error) {
+        console.error("Error creating PayPal order", error);
+      }
+    };
 
   
   return (
@@ -28,6 +42,19 @@ const App = () => {
       <div className="flex flex-col min-h-screen">
         {/* Navbar */}
         <Navbar onCategoryChange={handleCategoryChange} />
+        return (
+    <PayPalScriptProvider options={{ "client-id": "YOUR_PAYPAL_CLIENT_ID" }}>
+      <div style={{ textAlign: "center", marginTop: "50px" }}>
+        <h2>PayPal Payment Integration</h2>
+        <input
+          type="number"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+        />
+        <button onClick={createOrder}>Pay with PayPal</button>
+      </div>
+    </PayPalScriptProvider>
+  );
        
 
         <main className="flex-grow">
@@ -42,7 +69,7 @@ const App = () => {
             <Route path="/businesscard" element={<BusinessCard/>} />
             <Route path="/services" element={<Services />} />
             <Route path="/" element={<Navigate to="/home" />} />
-            <Route path="/payment" element={<Payment />} />
+           
           </Routes>
         </main>
         
@@ -54,4 +81,8 @@ const App = () => {
   );
 };
 
+
+
 export default App;
+
+

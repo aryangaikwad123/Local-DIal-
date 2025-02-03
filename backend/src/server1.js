@@ -1,37 +1,67 @@
+require("dotenv").config();
 const express = require("express");
-const Razorpay = require("razorpay");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-require("dotenv").config(); // Load environment variables
+const paypal = require("paypal-rest-sdk");
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Initialize Razorpay instance
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
+// Configure PayPal
+paypal.configure({
+  mode: "sandbox", // or 'live' for production
+  client_id: process.env.PAYPAL_CLIENT_ID,
+  client_secret: process.env.PAYPAL_CLIENT_SECRET,
 });
 
-// API to create an order
-app.post("/create-order", async (req, res) => {
-  const { amount, currency } = req.body; // Get amount and currency from frontend
-
-  const options = {
-    amount: amount * 100, // Amount in paise (₹1 = 100 paise)
-    currency: currency || "INR",
-    receipt: `order_rcptid_${Date.now()}`,
+app.post("/pay", (req, res) => {
+  const paymentData = {
+    intent: "sale",
+    payer: {
+      payment_method: "paypal",
+    },
+    redirect_urls: {
+      return_url: "http://localhost:3000/success",
+      cancel_url: "http://localhost:3000/cancel",
+    },
+    transactions: [
+      {
+        amount: {
+          total: req.body.amount,
+          currency: "USD",
+        },
+        description: "Payment for your order",
+      },
+    ],
   };
 
-  try {
-    const order = await razorpay.orders.create(options);
-    res.json(order); // Send order details to frontend
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  paypal.payment.create(paymentData, (error, payment) => {
+    if (error) {
+      res.status(500).json({ error });
+    } else {
+      const approvalUrl = payment.links.find(
+        (link) => link.rel === "approval_url"
+      ).href;
+      res.json({ approvalUrl });
+    }
+  });
 });
 
-// Start the server
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.get("/success", (req, res) => {
+  const { paymentId, PayerID } = req.query;
+
+  paypal.payment.execute(
+    paymentId,
+    { payer_id: PayerID },
+    (error, payment) => {
+      if (error) {
+        res.status(500).json({ error });
+      } else {
+        res.json({ message: "Payment successful", payment });
+      }
+    }
+  );
+});
+
+app.listen(5000, () => console.log("Server running on port 5000"));
